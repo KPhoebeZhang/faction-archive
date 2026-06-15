@@ -1,1 +1,10 @@
 ## Summary
+#### Duskfield — The Silenced
+
+Formed from exiled Tidewall members (and their descendants) who refused to continue the trading life. Spread across small, varied villages, deliberately dispersed. Core cultural values: kindness to all strangers, and near-total discouragement of speech — though they are physically capable of it.
+
+The kindness rule and the silence rule work together: kindness ensures no exile or outsider is ever turned away (so other factions never have to worry about what happens to people they cast out), and silence ensures no one ever asks _why_ — why they were exiled, why they're treated this way, why things are run as they are. Mistakes are tolerated as long as basic rules are followed. At 15, a Duskfield person may leave to travel to other factions — rare, undocumented, quietly discouraged, with no formal process.
+
+Duskfield's bloodlines cross every other faction — Tidewall by origin, with threads of Fornholt and Ashkeep through generations of exile. This makes them the only population with the _raw material_ to piece together a complete picture of the world's true history. **This is exactly why they are not allowed to speak.** Their silence is load-bearing — not for them, but for the fiction that the other three factions are distinct, coherent, separate peoples. A Duskfield person speaking freely doesn't just share information; their existence demonstrates that the boundaries between factions were always permeable, and that whatever came before the "collapse" didn't cleanly separate into four peoples — it produced something messier that everyone has agreed not to see.
+
+New Duskfield villages can be founded by exile groups who, despite being "new" to this life, somehow already know how to run a village — a detail with an as-yet-undetermined explanation, likely tied to the broader history.
