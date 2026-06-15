@@ -1,0 +1,3 @@
+- The antagonist's logic is airtight, not villainous — this should not be softened into a more conventional "evil plan" as the story develops.
+- The faction systems (especially Tidewall's masked gathering and Duskfield's kindness/silence pairing) are mechanically elegant _and_ thematically load-bearing — avoid adding factions or systems that don't carry double meaning this way.
+- The protagonist's incentive should remain personal and specific (a dead brother, a second dead child, an unbearable specific wrongness) rather than ideological — she should arrive at the philosophy, not start with it.
