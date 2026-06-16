@@ -27,9 +27,8 @@ faction-based knowledge architecture.
 
 ## Architecture (as built so far)
 Two-layer AI system:
-- Layer 1 (Rain World-style): hidden numeric NPC values 
-  (relationship, reputation, personality + faction-specific values).
-  No LLM cost. Drives most behavior.
+- Layer 1 (traditional game AI): hidden NPC values + 
+  JSON save system. See backend/docs/npc_values.md
 - Layer 2 (LLM synthesis): triggered only when value thresholds 
   are crossed. Reserved for revelation moments and ending generation.
 
