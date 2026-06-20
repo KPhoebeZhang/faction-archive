@@ -1,0 +1,242 @@
+# DEPRECATED - Skill now lives in the [Randroid's Dojo](https://github.com/Randroids-Dojo/skills/tree/main/plugins/godot) marketplace
+
+---
+---
+
+---
+# Godot-Claude-Skills
+
+A Claude Code skill for Godot Engine game development.
+
+## What are Skills?
+
+Skills are folders of instructions, scripts, and resources that Claude loads dynamically to improve performance on specialized tasks. Each skill contains a `SKILL.md` file with YAML frontmatter and markdown instructions.
+
+## Repository Structure
+
+```
+.
+├── .claude-plugin/
+│   ├── plugin.json            # Plugin metadata for marketplace
+│   └── marketplace.json       # Marketplace registry info
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # GitHub Actions CI workflow
+├── example-project/           # Tic-Tac-Toe game for testing
+│   ├── project.godot
+│   ├── test/                  # GdUnit4 test files
+│   ├── scenes/
+│   └── scripts/
+├── skills/
+│   └── godot/                 # Godot development skill
+│       ├── SKILL.md
+│       ├── scripts/           # Python helper scripts
+│       └── references/        # Documentation
+├── LICENSE                    # MIT License
+├── CHANGELOG.md               # Version history
+└── README.md
+```
+
+## Godot Skill
+
+Develop, test, build, and deploy Godot 4.x games. Includes:
+
+- **GdUnit4 integration** - Unit tests, scene tests, input simulation
+- **PlayGodot automation** - Game automation framework for E2E testing (like Playwright for games)
+- **Web/Desktop exports** - Build and export games
+- **CI/CD pipelines** - GitHub Actions workflows
+- **Deployment** - Vercel, GitHub Pages, itch.io
+- **Python helper scripts** - `run_tests.py`, `parse_results.py`, `export_build.py`
+
+### Quick Example
+
+```gdscript
+# test/game_test.gd
+extends GdUnitTestSuite
+
+func test_player_health() -> void:
+    var player = auto_free(Player.new())
+    assert_that(player.health).is_equal(100)
+
+    player.take_damage(30)
+    assert_that(player.health).is_equal(70)
+```
+
+### Running Tests
+
+```bash
+# Run all tests with GdUnit4
+godot --headless --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
+
+# Using helper script
+python skills/godot/scripts/run_tests.py --project ./my-game
+```
+
+### PlayGodot Game Automation
+
+[PlayGodot](https://github.com/Randroids-Dojo/PlayGodot) is a game automation framework for Godot - like Playwright, but for games. Control games from Python, write E2E tests, capture screenshots, and simulate input via Godot's native debugger protocol.
+
+**Requirements:**
+- Custom Godot fork with automation support: [Randroids-Dojo/godot](https://github.com/Randroids-Dojo/godot) (automation branch)
+- PlayGodot Python library:
+  ```bash
+  python -m venv .venv
+  source .venv/bin/activate  # Windows: .venv\Scripts\activate
+  pip install playgodot
+  ```
+
+```python
+import pytest
+from playgodot import Godot
+
+@pytest.mark.asyncio
+async def test_game_state():
+    async with Godot.launch("./my-game", headless=True) as game:
+        await game.wait_for_node("/root/Game")
+
+        # Call game methods
+        result = await game.call_method("/root/Game", "get_score")
+        assert result == 0
+
+        # Get/set properties
+        health = await game.get_property("/root/Game/Player", "health")
+        await game.set_property("/root/Game/Player", "health", 100)
+
+        # Simulate input
+        await game.click(400, 300)
+        await game.press_key(KEY_SPACE)
+        await game.press_action("jump")
+
+        # Screenshots
+        await game.screenshot("test_screenshot.png")
+```
+
+```bash
+# Run PlayGodot tests
+pytest tests/ -v
+```
+
+### Building & Deploying
+
+```bash
+# Export web build
+godot --headless --export-release "Web" ./build/index.html
+
+# Deploy to Vercel
+vercel deploy ./build --prod
+```
+
+### Vercel Deployment Setup
+
+To enable automatic Vercel deployment from GitHub Actions:
+
+1. Install Vercel CLI and link project:
+   ```bash
+   npm i -g vercel
+   vercel link
+   ```
+
+2. Add GitHub repository secrets (Settings → Secrets → Actions):
+   - `VERCEL_TOKEN` - Get from [vercel.com/account/tokens](https://vercel.com/account/tokens)
+   - `VERCEL_ORG_ID` - From `.vercel/project.json`
+   - `VERCEL_PROJECT_ID` - From `.vercel/project.json`
+
+3. Add GitHub repository variable:
+   - `ENABLE_VERCEL_DEPLOY` = `true`
+
+See [deployment.md](skills/godot/references/deployment.md) for detailed instructions.
+
+## Example Project
+
+The repository includes a **Tic-Tac-Toe** game (`example-project/`) with full test coverage:
+
+- **2-player game** with X and O turns
+- **Win detection** for rows, columns, and diagonals
+- **Draw detection** when board is full
+- **GdUnit4 tests** - Unit and integration tests
+- **PlayGodot automation** - E2E tests via game automation framework
+- **Web export** - Deployable to Vercel
+
+### Running Locally
+
+```bash
+# Open in Godot Editor
+godot --path example-project --editor
+
+# Run headless (for testing)
+godot --headless --path example-project --quit
+
+# Run GdUnit4 tests (after installing GdUnit4)
+cd example-project
+godot --headless -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
+
+# Run PlayGodot E2E tests (requires Randroids-Dojo/godot automation branch)
+cd example-project
+pytest tests/ -v
+```
+
+## Installing the Skill
+
+### Option 1: Plugin Marketplace (Recommended)
+
+This repository is a Claude Code plugin marketplace. Install via:
+
+```bash
+/plugin marketplace add Randroids-Dojo/Godot-Claude-Skills
+/plugin install godot
+```
+
+The skill will be available in all your Claude Code sessions.
+
+### Option 2: Project-Level
+
+Add to your project so all team members get it via git:
+
+```bash
+git clone https://github.com/Randroids-Dojo/Godot-Claude-Skills.git
+mkdir -p your-project/.claude/skills
+cp -r Godot-Claude-Skills/skills/godot your-project/.claude/skills/
+cd your-project
+git add .claude/skills
+git commit -m "Add Godot Claude skill"
+```
+
+### Option 3: Personal Installation
+
+Install for all your projects (just for you):
+
+```bash
+git clone https://github.com/Randroids-Dojo/Godot-Claude-Skills.git
+mkdir -p ~/.claude/skills
+cp -r Godot-Claude-Skills/skills/godot ~/.claude/skills/
+```
+
+### Verifying Installation
+
+Restart Claude Code after installation. The skill will be automatically discovered when you work on Godot projects. You can invoke it directly with `/godot` or ask Claude about GdUnit4 testing, Godot exports, or PlayGodot automation.
+
+## CI/CD
+
+This repository includes GitHub Actions CI that:
+
+1. **Installs Claude CLI** - Sets up `@anthropic-ai/claude-code` via npm
+2. **Installs Godot Engine** - Sets up Godot 4.3.0 with export templates
+3. **Installs GdUnit4** - Clones testing framework into example project
+4. **Runs Tests** - Executes all GdUnit4 unit and integration tests
+5. **Builds Web Export** - Creates deployable web build
+6. **Deploys to Vercel** - Automatic deployment on merge to main (optional)
+
+The CI runs on:
+- Push to `main`/`master` branches
+- Pull requests to `main`/`master` branches
+- Manual trigger via `workflow_dispatch`
+
+## Resources
+
+- [Claude Code Skills Documentation](https://docs.anthropic.com/en/docs/claude-code/skills)
+- [GdUnit4 Documentation](https://mikeschulze.github.io/gdUnit4/)
+- [Godot Engine Documentation](https://docs.godotengine.org/)
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
