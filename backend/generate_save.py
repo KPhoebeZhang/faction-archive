@@ -13,15 +13,28 @@ with open(DATA_DIR / "save_template.json") as f:
 
 save = json.loads(json.dumps(template))
 
+duskfield_exile_count = 0
+
 for npc_id, npc_def in npc_definitions.items():
     basic_pool = npc_def.get("eligible_basic_traits", [])
     addon_pool = npc_def.get("eligible_addon_traits", [])
+
+    if duskfield_exile_count >= 2:
+        basic_pool = [t for t in basic_pool if t != "duskfield_exile"]
 
     basic_assigned = random.sample(basic_pool, min(4, len(basic_pool)))
 
     if "almost_voice" in basic_assigned and "pattern_sensitive" not in basic_assigned:
         if random.random() < 0.70:
             basic_assigned.append("pattern_sensitive")
+
+    if "duskfield_exile" in basic_assigned and duskfield_exile_count < 2:
+        if random.random() >= 0.15:
+            basic_assigned.remove("duskfield_exile")
+        else:
+            duskfield_exile_count += 1
+    elif "duskfield_exile" in basic_assigned:
+        basic_assigned.remove("duskfield_exile")
 
     addon_assigned = random.sample(addon_pool, min(2, len(addon_pool)))
 
