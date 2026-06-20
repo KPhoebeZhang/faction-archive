@@ -9,7 +9,13 @@ faction-based knowledge architecture.
 - Python 3.12.4
 - LangChain, LangGraph, ChromaDB
 - Anthropic API (not yet configured — API key pending)
-- Game engine: Godot 4, 2D (planned, not yet started)
+
+## Godot
+- Engine: Godot 4 only — never Godot 3 syntax
+- Skill: read skills/godot-claude-skills/SKILL.md 
+  before any GDScript or .tscn work
+- Project: game/ (not created yet — do not create)
+- Setup details: see docs/godot-setup.md
 
 ## Structure
 - vault/        Lore, story notes, progress log — READ ONLY
