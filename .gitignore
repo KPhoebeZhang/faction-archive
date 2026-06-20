@@ -1,2 +1,9 @@
 vault/.obsidian/
 .venv/
+
+# Godot — ignore generated/local files, keep source-controlled content
+game/*
+!game/project.godot
+!game/scenes/
+!game/scripts/
+!game/assets/
