@@ -1,0 +1,520 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test Godot Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Node.js for Claude CLI
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Setup Python for helper scripts
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Install Claude CLI globally
+      - name: Install Claude CLI
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          echo "Claude CLI installed successfully"
+
+      # Verify Claude CLI installation
+      - name: Verify Claude CLI
+        run: |
+          claude --version || echo "Claude CLI installed (version check may require auth)"
+
+      # Setup Godot Engine with export templates
+      - name: Setup Godot Engine
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: true
+
+      # Verify Godot installation
+      - name: Verify Godot
+        run: |
+          godot --version
+          echo "Godot Engine installed successfully"
+
+      # Install skills to .claude/skills directory
+      - name: Install Claude Skills
+        run: |
+          mkdir -p .claude/skills
+          cp -r skills/* .claude/skills/
+          echo "Skills installed:"
+          find .claude/skills -name "SKILL.md" -type f
+
+      # Validate skill format
+      - name: Validate Skills
+        run: |
+          echo "Validating skill files..."
+          for skill_file in .claude/skills/*/SKILL.md; do
+            if [ -f "$skill_file" ]; then
+              # Check for YAML frontmatter
+              if head -1 "$skill_file" | grep -q "^---$"; then
+                # Check for required fields
+                if grep -q "^name:" "$skill_file" && grep -q "^description:" "$skill_file"; then
+                  echo "✓ Valid: $skill_file"
+                else
+                  echo "✗ Missing required fields in: $skill_file"
+                  exit 1
+                fi
+              else
+                echo "✗ Missing YAML frontmatter in: $skill_file"
+                exit 1
+              fi
+            fi
+          done
+          echo "All skills validated successfully!"
+
+      # Install GdUnit4 for testing
+      - name: Install GdUnit4
+        run: |
+          echo "=== Installing GdUnit4 ==="
+          cd example-project
+          git clone --depth 1 --branch v4.4.0 https://github.com/MikeSchulze/gdUnit4.git addons/gdUnit4
+          echo "GdUnit4 installed successfully"
+
+      # Import Godot project (generates .godot cache)
+      # Run twice: first to cache GdUnit4 addon, second for clean import
+      - name: Import Godot Project
+        run: |
+          echo "=== Importing Godot Project ==="
+          cd example-project
+          timeout 60 godot --headless --import . --quit 2>&1 || true
+          echo "=== Re-importing (with GdUnit4 cached) ==="
+          timeout 60 godot --headless --import . --quit 2>&1 | tee import.log || true
+          echo ""
+          echo "Import complete."
+
+      # Validate GDScript files (excluding addons)
+      - name: Validate GDScript
+        run: |
+          echo "=== Validating GDScript Files ==="
+          cd example-project
+          for script in $(find . -name "*.gd" -type f -not -path "./addons/*"); do
+            echo "Checking: $script"
+          done
+          echo "Script validation complete."
+
+      # Run project in headless mode (basic smoke test)
+      - name: Run Headless Smoke Test
+        run: |
+          echo "=== Running Headless Smoke Test ==="
+          cd example-project
+          timeout 30 godot --headless --quit 2>&1 | tee run.log || true
+          echo ""
+          echo "=== Game Output ==="
+          cat run.log
+          echo ""
+          echo "=== Checking for Expected Output ==="
+          if grep -q "\[TicTacToe\] Game initialized" run.log; then
+            echo "✓ Game initialized successfully"
+          else
+            echo "✗ Game initialization message not found"
+            exit 1
+          fi
+          if grep -q "\[TicTacToe\] Board initialized" run.log; then
+            echo "✓ Board initialized successfully"
+          else
+            echo "✗ Board initialization message not found"
+            exit 1
+          fi
+          echo ""
+          echo "=== Checking for Errors ==="
+          if grep -iE "(SCRIPT ERROR|ERROR:)" run.log; then
+            echo "Errors detected in game output!"
+            exit 1
+          fi
+          echo "No errors found in game output."
+
+      # Run GdUnit4 tests
+      - name: Run GdUnit4 Tests
+        run: |
+          echo "=== Running GdUnit4 Tests ==="
+          cd example-project
+          mkdir -p reports
+          timeout 120 godot --headless \
+            -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd \
+            --run-tests \
+            --add res://test/ \
+            --report-directory ./reports \
+            2>&1 | tee test.log || true
+          echo ""
+          echo "=== Test Output ==="
+          cat test.log
+          echo ""
+          # Check for test failures in output
+          if grep -q "FAILED" test.log; then
+            echo "Some tests failed!"
+            exit 1
+          fi
+          echo "Tests completed."
+
+      # NOTE: PlayGodot integration tests run in a separate job
+      # They require a pre-built Godot with automation support
+      - name: PlayGodot Tests Info
+        run: |
+          echo "=== PlayGodot Tests ==="
+          echo "PlayGodot integration tests run in a separate job."
+          echo "They use a pre-built Godot with automation support from:"
+          echo "  https://github.com/Randroids-Dojo/godot/releases/tag/automation-latest"
+
+      # Parse and display test results
+      - name: Parse Test Results
+        if: always()
+        run: |
+          echo "=== Test Results ==="
+          if [ -d "example-project/reports" ]; then
+            python skills/godot/scripts/parse_results.py \
+              example-project/reports \
+              --format summary || echo "No test results to parse"
+          else
+            echo "No reports directory found"
+          fi
+
+      # Upload test reports
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: example-project/reports/
+          if-no-files-found: ignore
+
+      # Display test summary
+      - name: Test Summary
+        run: |
+          echo "========================================="
+          echo "        CI TEST SUMMARY"
+          echo "========================================="
+          echo ""
+          echo "Environment:"
+          echo "  Node.js: $(node --version)"
+          echo "  npm: $(npm --version)"
+          echo "  Python: $(python --version)"
+          echo "  Godot: $(godot --version)"
+          echo ""
+          echo "Skills Installed:"
+          ls -1 .claude/skills/
+          echo ""
+          echo "Test Files:"
+          find example-project/test -name "*_test.gd" -type f 2>/dev/null || echo "No test files found"
+          echo ""
+          echo "========================================="
+          echo "        ALL TESTS PASSED"
+          echo "========================================="
+
+  # PlayGodot Integration Tests
+  # Uses pre-built Godot with automation support from our fork
+  playgodot-tests:
+    name: PlayGodot Integration Tests
+    runs-on: ubuntu-latest
+    needs: test
+    # Can be disabled by setting ENABLE_PLAYGODOT_TESTS=false
+    if: vars.ENABLE_PLAYGODOT_TESTS != 'false'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download Godot Automation Build
+        run: |
+          echo "=== Downloading Godot with Automation Support ==="
+          mkdir -p godot-automation
+          cd godot-automation
+          # Download from our fork's automation-latest release
+          curl -L -o godot.zip \
+            "https://github.com/Randroids-Dojo/godot/releases/download/automation-latest/godot-automation-linux-x86_64.zip"
+          unzip godot.zip
+          # Binary is the mono version
+          chmod +x godot.linuxbsd.editor.x86_64.mono
+          ls -la
+          ./godot.linuxbsd.editor.x86_64.mono --version || echo "Version check requires display"
+
+      - name: Clone PlayGodot
+        run: |
+          echo "=== Cloning PlayGodot ==="
+          git clone --depth 1 https://github.com/Randroids-Dojo/PlayGodot.git
+
+      - name: Install PlayGodot
+        run: |
+          cd PlayGodot/python
+          pip install -e .
+          pip install pytest pytest-asyncio
+
+      - name: Import Godot Project
+        run: |
+          echo "=== Importing Godot Project ==="
+          cd example-project
+          # Use Xvfb for headless display
+          xvfb-run --auto-servernum ../godot-automation/godot.linuxbsd.editor.x86_64.mono \
+            --headless --import . --quit 2>&1 || true
+          echo "Import complete"
+
+      - name: Run PlayGodot Tests
+        run: |
+          echo "=== Running PlayGodot Integration Tests ==="
+          cd example-project
+          export GODOT_PATH="${{ github.workspace }}/godot-automation/godot.linuxbsd.editor.x86_64.mono"
+          # Run with xvfb for headless display support
+          xvfb-run --auto-servernum pytest tests/test_playgodot.py -v --tb=short
+          echo "PlayGodot tests completed"
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playgodot-screenshots
+          path: example-project/tests/screenshots/
+          if-no-files-found: ignore
+
+  build-and-deploy:
+    name: Build & Deploy Web
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_VERCEL_DEPLOY == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Godot Engine with export templates
+      - name: Setup Godot Engine
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: true
+
+      # Import Godot project
+      - name: Import Godot Project
+        run: |
+          cd example-project
+          timeout 60 godot --headless --import . --quit 2>&1 || true
+
+      # Build Web export
+      - name: Build Web Export
+        run: |
+          echo "=== Building Web Export ==="
+          cd example-project
+          mkdir -p build
+          godot --headless --export-release "Web" ./build/index.html 2>&1 | tee export.log
+          echo ""
+          echo "=== Export Output ==="
+          cat export.log
+          echo ""
+          echo "=== Build Files ==="
+          ls -la build/
+          if [ -f "build/index.html" ]; then
+            echo "✓ Web build successful"
+          else
+            echo "✗ Web build failed - index.html not found"
+            exit 1
+          fi
+
+      # Copy Vercel config to build directory
+      - name: Prepare Vercel Config
+        run: |
+          cp example-project/vercel.json example-project/build/
+
+      # Upload build artifact
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: example-project/build/
+
+      # Deploy to Vercel (only if VERCEL_TOKEN is configured)
+      # To enable Vercel deployment:
+      # 1. Create a Vercel account at https://vercel.com
+      # 2. Install Vercel CLI: npm i -g vercel
+      # 3. Run `vercel link` in example-project/build to create project
+      # 4. Get VERCEL_ORG_ID and VERCEL_PROJECT_ID from .vercel/project.json
+      # 5. Create a token at https://vercel.com/account/tokens
+      # 6. Add secrets in GitHub: Settings → Secrets → Actions:
+      #    - VERCEL_TOKEN: Your Vercel API token
+      #    - VERCEL_ORG_ID: Your organization/team ID
+      #    - VERCEL_PROJECT_ID: Your project ID
+      # 7. Add variable in GitHub: Settings → Variables → Actions:
+      #    - ENABLE_VERCEL_DEPLOY: true
+      - name: Deploy to Vercel
+        if: ${{ vars.ENABLE_VERCEL_DEPLOY == 'true' }}
+        run: |
+          echo "=== Deploying to Vercel ==="
+          npm i -g vercel
+          cd example-project/build
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      # Build summary
+      - name: Build Summary
+        run: |
+          echo "========================================="
+          echo "        BUILD & DEPLOY SUMMARY"
+          echo "========================================="
+          echo ""
+          echo "Web build created successfully!"
+          echo ""
+          echo "Build contents:"
+          ls -lh example-project/build/
+          echo ""
+          if [ "${{ vars.ENABLE_VERCEL_DEPLOY }}" == "true" ]; then
+            echo "Deployed to Vercel"
+          else
+            echo "Vercel deployment skipped (ENABLE_VERCEL_DEPLOY not set)"
+            echo "To enable, set repository variable ENABLE_VERCEL_DEPLOY=true"
+            echo "and configure VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID secrets"
+          fi
+          echo ""
+          echo "========================================="
+
+  # Claude Code Agent Test - runs the game using Claude with the godot skill
+  claude-agent-test:
+    name: Claude Agent Test
+    runs-on: ubuntu-latest
+    needs: test
+    # Only run if ANTHROPIC_API_KEY is configured and enabled
+    if: vars.ENABLE_CLAUDE_AGENT_TEST == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Download Godot Automation Build
+        run: |
+          echo "=== Downloading Godot with Automation Support ==="
+          mkdir -p godot-automation
+          cd godot-automation
+          curl -L -o godot.zip \
+            "https://github.com/Randroids-Dojo/godot/releases/download/automation-latest/godot-automation-linux-x86_64.zip"
+          unzip godot.zip
+          chmod +x godot.linuxbsd.editor.x86_64.mono
+          echo "GODOT_PATH=$(pwd)/godot.linuxbsd.editor.x86_64.mono" >> $GITHUB_ENV
+
+      - name: Clone and Install PlayGodot
+        run: |
+          git clone --depth 1 https://github.com/Randroids-Dojo/PlayGodot.git
+          cd PlayGodot/python
+          pip install -e .
+          pip install pytest pytest-asyncio
+
+      - name: Import Godot Project
+        run: |
+          cd example-project
+          xvfb-run --auto-servernum $GODOT_PATH --headless --import . --quit 2>&1 || true
+
+      - name: Install Claude Skills
+        run: |
+          mkdir -p .claude/skills
+          cp -r skills/* .claude/skills/
+          echo "Skills installed:"
+          find .claude/skills -name "SKILL.md" -type f
+
+      - name: Run Claude Agent with PlayGodot
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GODOT_PATH: ${{ env.GODOT_PATH }}
+        run: |
+          echo "=== Running Claude Code Agent with Godot Skill (PlayGodot) ==="
+          cd example-project
+
+          # Run Claude with a prompt to use the godot skill with PlayGodot
+          # --print outputs only the final response
+          # --dangerously-skip-permissions skips permission prompts for CI
+          claude --print --dangerously-skip-permissions \
+            "Use the godot skill with PlayGodot to launch the tic-tac-toe game (headless=True), click on cell 4 (center), and verify the board state shows an X in position 4. The GODOT_PATH environment variable is already set."
+
+          echo ""
+          echo "=== Claude Agent Test Complete ==="
+
+  # PR Preview Deployments - creates a unique URL for each pull request
+  # Requires the same Vercel secrets as the main deployment above
+  preview-deploy:
+    name: Deploy PR Preview
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request' && vars.ENABLE_VERCEL_DEPLOY == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Godot Engine with export templates
+      - name: Setup Godot Engine
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: true
+
+      # Import and build
+      - name: Build Web Export
+        run: |
+          cd example-project
+          timeout 60 godot --headless --import . --quit 2>&1 || true
+          mkdir -p build
+          godot --headless --export-release "Web" ./build/index.html
+          cp vercel.json build/
+
+      # Deploy preview to Vercel
+      - name: Deploy Preview
+        id: deploy
+        run: |
+          npm i -g vercel
+          cd example-project/build
+          url=$(vercel deploy --token=${{ secrets.VERCEL_TOKEN }} --yes)
+          echo "url=$url" >> $GITHUB_OUTPUT
+          echo "Preview URL: $url"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      # Comment on PR with preview URL
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `🎮 **Preview Deployment**\n\nPlay the game: ${{ steps.deploy.outputs.url }}`
+            })
