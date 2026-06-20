@@ -1,0 +1,11 @@
+{
+  "mother_npc": {
+    "id": "mother_npc",
+    "name": "Mother",
+    "faction": "duskfield",
+    "generation": "first",
+    "role": "parent",
+    "eligible_basic_traits": ["voluntary_keeper", "threshold_memory", "trauma_coping"],
+    "eligible_addon_traits": ["tender", "withdrawn"]
+  }
+}
