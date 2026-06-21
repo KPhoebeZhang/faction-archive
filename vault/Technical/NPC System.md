@@ -40,6 +40,7 @@ different people.
 - duskfield_exile assigned to maximum 1-2 NPCs per save
 - 2 add-on traits drawn from universal pool, fully random
 - All traits latent at tier 0 — behaviorally inert until unlocked
+- duskfield_exile: 15% assignment chance, hard cap of 2 per save
 
 ## Layer 3 — States (dynamic)
 
