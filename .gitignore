@@ -1,5 +1,9 @@
 vault/.obsidian/
 .venv/
+.DS_Store
+backend/__pycache__/
+**/__pycache__/
+**/*.pyc
 
 # Godot — ignore generated/local files, keep source-controlled content
 game/*
