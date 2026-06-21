@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://duskfield_hut_interior"]
+
+[sub_resource type="TileSet" id="TileSet_1"]
+tile_shape = 1
+tile_size = Vector2i(64, 32)
+
+[node name="DuskfieldHutInterior" type="Node2D"]
+
+[node name="Floor" type="TileMapLayer" parent="."]
+y_sort_enabled = true
+tile_set = SubResource("TileSet_1")
+
+[node name="NPCs" type="Node2D" parent="."]
+
+[node name="Player" type="Node2D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
