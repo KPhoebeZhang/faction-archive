@@ -1,19 +1,21 @@
 {
   "npc_states": {
     "mother_npc": {
-      "trust": 0.0,
+      "trust": 0.4,
       "awareness": 0.0,
       "restraint": 0.5,
       "assigned_traits": [
-        "voluntary_keeper",
-        "threshold_memory",
         "trauma_coping",
-        "tender",
-        "withdrawn"
+        "threshold_memory",
+        "voluntary_keeper",
+        "withdrawn",
+        "tender"
       ],
-      "tier": 0,
-      "met_player": false,
-      "topics_revealed": [],
+      "tier": 1,
+      "met_player": true,
+      "topics_revealed": [
+        "silence_rule"
+      ],
       "last_interaction": "",
       "triggered": []
     }
