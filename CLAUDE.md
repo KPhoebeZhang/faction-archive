@@ -48,7 +48,7 @@ Game sends question + player state. Backend returns generated text.
 - No application code outside backend/ until game/ phase begins
 
 ## Current milestone
-Retrieval-only script: backend/test_rag.py
-Load vault/Lore/Factions/Duskfield.md → chunk → embed → 
-store in ChromaDB → retrieve top match for a test question → 
-print result. No LLM call yet.
+Backend pipeline complete — see backend/ for scripts.
+NPC system spec: vault/Technical/NPC System.md
+
+Next: FastAPI bridge between backend and Godot
