@@ -1,7 +1,7 @@
 {
   "npc_states": {
     "mother_npc": {
-      "trust": 0.08,
+      "trust": 0.16,
       "reputation": 0.5,
       "restraint": 0.5,
       "assigned_traits": [
