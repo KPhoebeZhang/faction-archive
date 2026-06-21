@@ -6,6 +6,8 @@
     "generation": "first",
     "role": "parent",
     "eligible_basic_traits": ["voluntary_keeper", "threshold_memory", "trauma_coping"],
-    "eligible_addon_traits": ["tender", "withdrawn"]
+    "eligible_addon_traits": ["tender", "withdrawn"],
+    "faction_value": "restraint",
+    "eligible_nature_traits": ["tender", "withdrawn", "curious", "fierce", "suspicious"]
   }
 }
