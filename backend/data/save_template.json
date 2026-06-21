@@ -2,8 +2,8 @@
   "npc_states": {
     "mother_npc": {
       "trust": 0.0,
-      "awareness": 0.0,
-      "restraint": 0.5,
+      "reputation": 0.5,
+      "faction_value": 0.5,
       "assigned_traits": [],
       "tier": 0,
       "met_player": false,
