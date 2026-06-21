@@ -38,22 +38,24 @@ for npc_id, npc_def in npc_definitions.items():
 
     addon_assigned = random.sample(addon_pool, min(2, len(addon_pool)))
 
-    assigned_traits = basic_assigned + addon_assigned
+    nature_pool = npc_def.get("eligible_nature_traits", [])
+    nature_assigned = random.sample(nature_pool, 1) if nature_pool else []
 
-    if npc_id not in save["npc_states"]:
-        save["npc_states"][npc_id] = {
-            "trust": 0.0,
-            "awareness": 0.0,
-            "restraint": 0.5,
-            "assigned_traits": [],
-            "tier": 0,
-            "met_player": False,
-            "topics_revealed": [],
-            "last_interaction": "",
-            "triggered": []
-        }
+    assigned_traits = basic_assigned + addon_assigned + nature_assigned
 
-    save["npc_states"][npc_id]["assigned_traits"] = assigned_traits
+    faction_value_key = npc_def.get("faction_value", "faction_value")
+
+    save["npc_states"][npc_id] = {
+        "trust": 0.0,
+        "reputation": 0.5,
+        faction_value_key: 0.5,
+        "assigned_traits": assigned_traits,
+        "tier": 0,
+        "met_player": False,
+        "topics_revealed": [],
+        "last_interaction": "",
+        "triggered": [],
+    }
 
 SAVES_DIR.mkdir(parents=True, exist_ok=True)
 save_path = SAVES_DIR / "save_01.json"
