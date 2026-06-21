@@ -2,3 +2,5 @@ langchain
 langchain-text-splitters
 langgraph
 chromadb
+fastapi
+uvicorn
