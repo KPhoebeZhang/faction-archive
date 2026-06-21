@@ -1,0 +1,25 @@
+{
+  "mother_npc": {
+    "tier_0": {
+      "ambient": [
+        "She shifts slightly, making room beside her.",
+        "She does not look up. The stems sort themselves through her fingers.",
+        "The morning sits between you, undisturbed."
+      ],
+      "on_approach": [
+        "She glances up briefly, then back down.",
+        "A pause in her hands. Then they continue."
+      ]
+    },
+    "tier_1": {
+      "ambient": [
+        "She stops what she is doing for a moment. Just stops. Then continues.",
+        "Her hands move with a steadiness that takes practice to have."
+      ],
+      "on_approach": [
+        "She makes room again, as she always does.",
+        "Her eyes find yours for just a moment longer than usual."
+      ]
+    }
+  }
+}
