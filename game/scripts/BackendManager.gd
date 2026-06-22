@@ -5,6 +5,10 @@ signal interaction_complete(npc_id: String, dialogue: String, trust: int, tier: 
 const BASE_URL = "http://localhost:8000"
 
 
+func _ready() -> void:
+	check_health()
+
+
 func call_interact(npc_id: String, interaction_type: String) -> void:
 	var http := HTTPRequest.new()
 	add_child(http)
