@@ -27,6 +27,7 @@ tile_size = Vector2i(64, 32)
 sources/0 = SubResource("TileSetAtlasSource_1")
 
 [node name="DuskfieldHutInterior" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("2_script")
 
 [node name="Floor" type="TileMapLayer" parent="."]
@@ -36,15 +37,17 @@ tile_set = SubResource("TileSet_1")
 [node name="NPCs" type="Node2D" parent="."]
 
 [node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(320, 180)
+z_index = 10
 script = ExtResource("3_player")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 shape = SubResource("RectangleShape2D_1")
 
 [node name="ColorRect" type="ColorRect" parent="Player"]
-offset_left = -8.0
-offset_top = -24.0
-offset_right = 8.0
+offset_left = -16.0
+offset_top = -32.0
+offset_right = 16.0
 offset_bottom = 0.0
 color = Color(1, 0, 0, 1)
 
