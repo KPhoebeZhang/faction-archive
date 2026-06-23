@@ -2,6 +2,9 @@ extends CharacterBody2D
 
 const SPEED := 80.0
 
+func _ready() -> void:
+	position = Vector2(320, 180)
+
 func _physics_process(_delta: float) -> void:
 	var dir := Vector2.ZERO
 	if Input.is_action_pressed("ui_up"):
