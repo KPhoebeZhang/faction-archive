@@ -19,5 +19,6 @@
 - All sprites export with Nearest filter
 
 ## Headless Commands
-- Import: godot --headless --path game/ --import
-- Run: godot --headless --path game/
+- Godot binary: `/Applications/Godot.app/Contents/MacOS/Godot`
+- Import: `/Applications/Godot.app/Contents/MacOS/Godot --headless --path game/ --import`
+- Run and quit: `/Applications/Godot.app/Contents/MacOS/Godot --headless --path game/ --quit`
