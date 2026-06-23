@@ -1,22 +1,13 @@
 [gd_scene load_steps=7 format=3 uid="uid://duskfield_hut_interior"]
 
-[ext_resource type="Texture2D" path="res://assets/tiles/philtacular_isometric.png" id="1_atlas"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tile_stone_floor.png" id="1_atlas"]
 [ext_resource type="Script" path="res://scripts/FloorPainter.gd" id="2_script"]
 [ext_resource type="Script" path="res://scripts/PlayerController.gd" id="3_player"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1"]
 texture = ExtResource("1_atlas")
-texture_region_size = Vector2i(64, 32)
+texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
-1:0/0 = 0
-2:0/0 = 0
-3:0/0 = 0
-4:0/0 = 0
-5:0/0 = 0
-6:0/0 = 0
-7:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 8)
