@@ -16,8 +16,8 @@ func _on_body_entered(body: Node2D) -> void:
 		print("Player entered range of %s" % npc_id)
 		_backend.call_interact(npc_id, "approach")
 
-func _on_interaction_complete(id: String, dialogue: String, _trust: int, _tier: String) -> void:
-	if id != npc_id:
+func _on_interaction_complete(npc_id: String, dialogue: String, trust: float, tier: int) -> void:
+	if npc_id != self.npc_id:
 		return
 	print("Interaction complete: %s" % dialogue)
 	_dialogue_ui.show_dialogue("Mother", dialogue)
