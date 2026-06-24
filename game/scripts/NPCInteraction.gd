@@ -13,9 +13,11 @@ func _ready() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
+		print("Player entered range of %s" % npc_id)
 		_backend.call_interact(npc_id, "approach")
 
 func _on_interaction_complete(id: String, dialogue: String, _trust: int, _tier: String) -> void:
 	if id != npc_id:
 		return
+	print("Interaction complete: %s" % dialogue)
 	_dialogue_ui.show_dialogue("Mother", dialogue)
