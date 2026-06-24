@@ -62,3 +62,51 @@ never affect trust/reputation math directly.
 ### Next
 - Connect Godot to FastAPI via HTTP request
 - Player character placeholder in opening scene
+
+## June 24, 2026
+
+### Done
+- Full backend pipeline confirmed working end to end
+- Fragment ingestion, NPC tier gating, trust progression 
+  all verified
+- FastAPI server with /interact and /health endpoints
+- Godot 4.7 project with isometric 64x32 stone floor tiles
+- Player CharacterBody2D with WASD isometric movement
+- Camera2D following player
+- MotherNPC Area2D with proximity detection
+- DialogueUI box displaying backend response
+- First in-game dialogue line displayed:
+  "She shifts slightly, making room beside her."
+- BackendManager autoload connecting Godot to FastAPI
+- PixelLab MCP installed and generating tiles
+
+### Current state (honest)
+- One NPC, one dialogue pool, one scene
+- No player sprite (red rectangle placeholder)
+- No NPC sprite (tan rectangle placeholder)
+- No ambient/automatic trust accumulation (only E key)
+- No linger detection (4-second stillness mechanic unbuilt)
+- No internal thought system (Observe verb unbuilt)
+- No Offer verb UI
+- No Interact verb UI
+- No player_knowledge accumulation in game
+- No topic triggers wired to save file
+- No father NPC
+- No opening hut interior (currently outdoors floor)
+- No camera bounds (player can walk off floor)
+- Floor grid hardcoded, not a proper map
+- Dialogue box unstyled (placeholder panel)
+- No sound, no music
+- No main menu or game loop
+
+### Next priorities
+1. Linger detection — 4 second stillness → trust gain
+2. Automatic approach trust (proximity, not just E key)
+3. Father NPC placeholder with own dialogue pool
+4. Camera bounds so player can't walk off floor
+5. Basic interaction UI (Offer, Interact, Observe buttons)
+6. Player sprite via PixelLab MCP
+7. Mother/Father NPC sprites via PixelLab MCP
+
+### Blocked on
+- Nothing currently — all systems have a clear next step
