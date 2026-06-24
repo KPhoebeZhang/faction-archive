@@ -29,13 +29,13 @@ func _interact_nearest_npc() -> void:
 
 func _physics_process(_delta: float) -> void:
 	var dir := Vector2.ZERO
-	if Input.is_action_pressed("ui_up"):
+	if Input.is_action_pressed("ui_up") or Input.is_key_pressed(KEY_W):
 		dir += Vector2(-1.0, -0.5)
-	if Input.is_action_pressed("ui_down"):
+	if Input.is_action_pressed("ui_down") or Input.is_key_pressed(KEY_S):
 		dir += Vector2(1.0, 0.5)
-	if Input.is_action_pressed("ui_left"):
+	if Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A):
 		dir += Vector2(-1.0, 0.5)
-	if Input.is_action_pressed("ui_right"):
+	if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
 		dir += Vector2(1.0, -0.5)
 	if dir != Vector2.ZERO:
 		dir = dir.normalized()
