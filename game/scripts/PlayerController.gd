@@ -11,6 +11,7 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.keycode == KEY_E and event.pressed and not event.echo:
+		print("E pressed, checking NPCs")
 		_interact_nearest_npc()
 
 func _interact_nearest_npc() -> void:
