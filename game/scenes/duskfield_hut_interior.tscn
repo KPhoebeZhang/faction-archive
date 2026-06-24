@@ -1,14 +1,18 @@
-[gd_scene load_steps=8 format=3 uid="uid://duskfield_hut_interior"]
+[gd_scene load_steps=10 format=3 uid="uid://duskfield_hut_interior"]
 
 [ext_resource type="Texture2D" path="res://assets/tiles/tile_stone_floor.png" id="1_atlas"]
 [ext_resource type="Script" path="res://scripts/FloorPainter.gd" id="2_script"]
 [ext_resource type="Script" path="res://scripts/PlayerController.gd" id="3_player"]
 [ext_resource type="Script" path="res://scripts/DialogueUI.gd" id="4_dialogue_ui"]
+[ext_resource type="Script" path="res://scripts/NPCInteraction.gd" id="5_npc_interaction"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1"]
 texture = ExtResource("1_atlas")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 80.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(16, 8)
@@ -28,7 +32,16 @@ tile_set = SubResource("TileSet_1")
 
 [node name="NPCs" type="Node2D" parent="."]
 
+[node name="MotherNPC" type="Area2D" parent="NPCs"]
+collision_mask = 1
+script = ExtResource("5_npc_interaction")
+npc_id = "mother_npc"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NPCs/MotherNPC"]
+shape = SubResource("CircleShape2D_1")
+
 [node name="Player" type="CharacterBody2D" parent="."]
+collision_layer = 1
 position = Vector2(320, 180)
 z_index = 10
 script = ExtResource("3_player")
