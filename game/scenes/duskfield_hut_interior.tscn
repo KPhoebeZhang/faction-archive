@@ -41,6 +41,21 @@ npc_id = "mother_npc"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NPCs/MotherNPC"]
 shape = SubResource("CircleShape2D_1")
 
+[node name="ColorRect" type="ColorRect" parent="NPCs/MotherNPC"]
+offset_left = -8.0
+offset_top = -24.0
+offset_right = 8.0
+offset_bottom = 0.0
+color = Color(0.769, 0.584, 0.416, 1)
+
+[node name="Label" type="Label" parent="NPCs/MotherNPC"]
+offset_left = -20.0
+offset_top = -45.0
+offset_right = 20.0
+offset_bottom = -29.0
+modulate = Color(1, 1, 1, 1)
+text = "Mother"
+
 [node name="Player" type="CharacterBody2D" parent="."]
 collision_layer = 1
 position = Vector2(320, 180)
