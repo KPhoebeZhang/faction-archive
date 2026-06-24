@@ -33,6 +33,7 @@ tile_set = SubResource("TileSet_1")
 [node name="NPCs" type="Node2D" parent="."]
 
 [node name="MotherNPC" type="Area2D" parent="NPCs"]
+position = Vector2(200, 160)
 collision_mask = 1
 script = ExtResource("5_npc_interaction")
 npc_id = "mother_npc"
