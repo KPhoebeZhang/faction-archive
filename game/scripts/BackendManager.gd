@@ -1,6 +1,6 @@
 extends Node
 
-signal interaction_complete(npc_id: String, dialogue: String, trust: int, tier: String)
+signal interaction_complete(npc_id: String, dialogue: String, trust: float, tier: int)
 
 const BASE_URL = "http://localhost:8000"
 
@@ -27,7 +27,7 @@ func _on_interact_response(result: int, _code: int, _headers: PackedStringArray,
 		push_error("BackendManager: failed to parse /interact response")
 		return
 	var data: Dictionary = json.get_data()
-	interaction_complete.emit(npc_id, data.get("dialogue", ""), data.get("trust", 0), data.get("tier", ""))
+	interaction_complete.emit(npc_id, data.get("dialogue", ""), float(data.get("trust", 0)), int(data.get("tier", 0)))
 
 
 func check_health() -> void:
