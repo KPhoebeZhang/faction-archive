@@ -6,13 +6,10 @@ var _dialogue_ui: Node
 var _backend: Node
 
 var _player_inside: bool = false
-var _player_ref: Node2D = null
-var _stillness_timer: float = 0.0
+var _presence_timer: float = 0.0
 var _linger_cooldown: float = 0.0
-var _stillness_origin: Vector2 = Vector2.ZERO
 
 const LINGER_TIME: float = 4.0
-const MOVE_THRESHOLD: float = 5.0
 const LINGER_COOLDOWN: float = 30.0
 
 func _ready() -> void:
@@ -26,35 +23,27 @@ func _process(delta: float) -> void:
 	if _linger_cooldown > 0.0:
 		_linger_cooldown -= delta
 
-	if not _player_inside or _player_ref == null:
+	if not _player_inside:
 		return
 
-	if _player_ref.global_position.distance_to(_stillness_origin) > MOVE_THRESHOLD:
-		_stillness_timer = 0.0
-		_stillness_origin = _player_ref.global_position
-		return
-
-	_stillness_timer += delta
-	if _stillness_timer >= LINGER_TIME and _linger_cooldown <= 0.0:
+	_presence_timer += delta
+	if _presence_timer >= LINGER_TIME and _linger_cooldown <= 0.0:
 		_backend.call_interact(npc_id, "linger")
 		print("Linger triggered for %s" % npc_id)
 		_linger_cooldown = LINGER_COOLDOWN
-		_stillness_timer = 0.0
+		_presence_timer = 0.0
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is CharacterBody2D:
 		print("Player entered range of %s" % npc_id)
 		_player_inside = true
-		_player_ref = body
-		_stillness_timer = 0.0
-		_stillness_origin = body.global_position
+		_presence_timer = 0.0
 		_backend.call_interact(npc_id, "approach")
 
 func _on_body_exited(body: Node2D) -> void:
 	if body is CharacterBody2D:
 		_player_inside = false
-		_player_ref = null
-		_stillness_timer = 0.0
+		_presence_timer = 0.0
 
 func _on_interaction_complete(npc_id: String, dialogue: String, trust: float, tier: int) -> void:
 	if npc_id != self.npc_id:
