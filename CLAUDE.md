@@ -1,54 +1,60 @@
 # The Remnant
 
-A RAG/agent system grounded in original fantasy lore, built as a 
-portfolio project targeting AI engineering roles. Demonstrates 
-retrieval-augmented generation, LangGraph orchestration, and 
-faction-based knowledge architecture.
+A 2D isometric narrative game (Godot 4) with a custom RAG/agent 
+backend, built as a portfolio project targeting AI engineering 
+roles. Zero runtime LLM cost — dialogue is pre-written and 
+tier-gated, selected via trust/relationship state. RAG is a 
+development tool for lore consistency, not a runtime component.
+
+## Environments
+- Mac (primary): everything — Godot, Aseprite, backend, 
+  visual testing. Path: ~/Desktop/Unspeakable
+- VPS (backup, used when away from home): backend/Python 
+  work only. Cannot run Godot editor or test the game 
+  visually — do not attempt GUI tasks there.
+
+Session discipline (critical with two machines):
+- ALWAYS start with: git pull origin main
+- ALWAYS end with: git push origin main
 
 ## Stack
-- Python 3.12.4
-- LangChain, LangGraph, ChromaDB
-- Anthropic API (not yet configured — API key pending)
-
-## Godot
-- Engine: Godot 4 only — never Godot 3 syntax
-- Skill: read skills/godot-claude-skills/SKILL.md 
-  before any GDScript or .tscn work
-- Project: game/ (not created yet — do not create)
-- Setup details: see docs/godot-setup.md
+- Python 3.12.4, FastAPI, Uvicorn
+- LangChain, LangGraph, ChromaDB (local embeddings, no API key)
+- Godot 4.7, GDScript
+- Anthropic API (not yet configured — dev-tool use only)
 
 ## Structure
 - vault/        Lore, story notes, progress log — READ ONLY
-                Never edit vault/ files unless explicitly asked
-- backend/      Python RAG/agent code — all technical work goes here
-- game/         Godot project — does not exist yet, do not create
-- requirements.txt  Source of truth for dependencies
-- .venv/        Local virtual environment — never commit
+- backend/      Python RAG/agent/API code
+- game/         Godot 4 project (EXISTS — isometric 2D)
+- requirements.txt  Source of truth for Python dependencies
 
-## Commands
-- Activate environment: source .venv/bin/activate
-- Install dependencies: pip install -r requirements.txt
-- Verify environment: python -c "import langchain, langgraph, 
-  chromadb; print('ok')"
+## Godot
+- Engine: Godot 4.7 only — never Godot 3 syntax
+- Skill: read skills/godot-claude-skills/SKILL.md before 
+  any GDScript or .tscn work
+- Mode: Isometric 2D pixel art, tile size 64x32
+- Setup details: docs/godot-setup.md
 
-## Architecture (as built so far)
-Two-layer AI system:
-- Layer 1 (traditional game AI): hidden NPC values + 
-  JSON save system. See backend/docs/npc_values.md
-- Layer 2 (LLM synthesis): triggered only when value thresholds 
-  are crossed. Reserved for revelation moments and ending generation.
+## Running the stack
+- Backend: source .venv/bin/activate && 
+  uvicorn backend.server:app --reload --port 8000
+- Godot: open game/project.godot in Godot editor, press F5
+- Both must run simultaneously for the game to connect to backend
 
-Game ↔ backend connection: one API call (FastAPI). 
-Game sends question + player state. Backend returns generated text.
+## Architecture
+Three-layer NPC system — see vault/Technical/NPC System.md
+Full pipeline (working): Godot player action → BackendManager.gd 
+(HTTP) → FastAPI /interact → process_interaction → 
+select_dialogue → JSON response → DialogueUI.gd displays line
 
 ## Conventions
 - Small commits, one unit of work per commit
-- Backend code lives in backend/ only
-- vault/ is creative/lore content — edited in Obsidian, not here
-- No application code outside backend/ until game/ phase begins
+- vault/ edited in Obsidian only, never by Claude Code
+- Full project state: vault/Handoffs/ (read for context on 
+  a new session)
 
 ## Current milestone
-Backend pipeline complete — see backend/ for scripts.
-NPC system spec: vault/Technical/NPC System.md
-
-Next: FastAPI bridge between backend and Godot
+Working: RAG pipeline, NPC trust/tier system, FastAPI server, 
+Godot scene with player movement + mother NPC + dialogue UI.
+Next: linger detection (4-second stillness trigger)
