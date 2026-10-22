@@ -1,5 +1,5 @@
 
-## June 2026 (Session 2)
+## June 2026 (S1)
 ### Done
 - NPC system design doc written
 - npc_definitions.json and save_template.json created
@@ -49,7 +49,7 @@ never affect trust/reputation math directly.
 - `withdrawn`
 - `fierce`
 
-## June 2026 (Session 2 continued)
+## June 2026 (S2)
 ### Done
 - Fragment ingestion working on real lore
 - NPC tier gating confirmed
@@ -110,3 +110,16 @@ never affect trust/reputation math directly.
 
 ### Blocked on
 - Nothing currently — all systems have a clear next step
+
+## July 3, 2026 (S1)
+### Done
+- Linger detection simplified to radius-time (4s inside radius)
+- Fixed signal type regression (trust float, tier int)
+- Diagnosed and fixed backend connection (server wasn't running)
+- Confirmed full chain working again: linger → backend → dialogue
+- Designed scripted opening: linger 1 = observation, 
+  linger 2 = back-rub gesture (not yet built)
+### Next
+- Build back-rub gesture on second linger
+- Fix double-linger firing bug (cooldown not working right)
+- Camera bounds so player can't walk off floor
