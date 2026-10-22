@@ -26,6 +26,7 @@ func _interact_nearest_npc() -> void:
 			nearest_dist = dist
 			nearest = npc
 	if nearest:
+		print("[E-linger] t=%.2f" % (Time.get_ticks_msec() / 1000.0))
 		_backend.call_interact(nearest.npc_id, "linger")
 
 func _physics_process(_delta: float) -> void:

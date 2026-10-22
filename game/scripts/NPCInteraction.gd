@@ -32,6 +32,7 @@ func _process(delta: float) -> void:
 	if _presence_timer >= LINGER_TIME and _linger_cooldown <= 0.0:
 		_linger_count += 1
 		_linger_cooldown = LINGER_COOLDOWN
+		print("[passive-linger] t=%.2f count=%d" % [Time.get_ticks_msec() / 1000.0, _linger_count])
 		_presence_timer = 0.0
 		print("Linger triggered for %s (count: %d)" % [npc_id, _linger_count])
 
