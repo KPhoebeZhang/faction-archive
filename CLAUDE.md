@@ -54,6 +54,20 @@ select_dialogue → JSON response → DialogueUI.gd displays line
 - Full project state: vault/Handoffs/ (read for context on 
   a new session)
 
+## Commit messages
+Format: `<emoji> <type>: <short imperative summary>`
+
+| Emoji | Type       | Use for                              |
+|-------|------------|--------------------------------------|
+| ✨    | feat       | new feature or mechanic              |
+| 🐛    | fix        | bug fix                              |
+| 🎨    | art        | sprites, tiles, visual assets        |
+| 📝    | docs       | lore, design docs, README            |
+| ♻️    | refactor   | restructure with no behavior change  |
+| 🔧    | chore      | config, deps, housekeeping           |
+
+Summaries: imperative mood, short. No "Co-Authored-By" lines.
+
 ## Current milestone
 Working: RAG pipeline, NPC trust/tier system, FastAPI server, 
 Godot scene with player movement + mother NPC + dialogue UI.
